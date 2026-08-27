@@ -15,6 +15,22 @@ use Illuminate\Support\Facades\DB;
 
 class StatsController extends Controller
 {
+    // B'zのセットリストには稲葉浩志のソロ曲が含まれることがあるため（DbSetlistResource参照）、
+    // 稲葉浩志の集計時はB'zのツアーのセットリストも走査対象に含める。
+    // 曲自体の帰属（db_songs.artist_id）で最終的に絞り込むので、B'z側の集計に
+    // 稲葉浩志の曲が混ざったり、その逆が起きたりはしない。
+    private const BZ_ARTIST_ID = 3;
+    private const INABA_ARTIST_ID = 39;
+
+    private function crossoverTourArtistIds(int $artistId): array
+    {
+        if ($artistId === self::INABA_ARTIST_ID) {
+            return [self::INABA_ARTIST_ID, self::BZ_ARTIST_ID];
+        }
+
+        return [$artistId];
+    }
+
     public function index(Request $request)
     {
         $tab = $request->get('tab', 'personal');
@@ -354,11 +370,13 @@ class StatsController extends Controller
         $totalSetlistPatterns = DbSetlist::whereIn('tour_id', $tourIds)->count();
         $totalSongs = DbSong::where('artist_id', $artistId)->count();
 
+        $songArtistIds = DbSong::pluck('artist_id', 'id');
+        $crossoverTourIds = DbConcert::whereIn('artist_id', $this->crossoverTourArtistIds($artistId))->pluck('id');
         $uniqueSongIds = [];
-        $tourSetlists = DbSetlist::whereIn('tour_id', $tourIds)->get();
+        $tourSetlists = DbSetlist::whereIn('tour_id', $crossoverTourIds)->get();
         foreach ($tourSetlists as $setlist) {
             foreach (array_merge($setlist->setlist ?? [], $setlist->encore ?? []) as $s) {
-                if (isset($s['song']) && is_numeric($s['song'])) {
+                if (isset($s['song']) && is_numeric($s['song']) && ($songArtistIds[(int)$s['song']] ?? null) === $artistId) {
                     $uniqueSongIds[(int)$s['song']] = true;
                 }
             }
@@ -383,13 +401,14 @@ class StatsController extends Controller
 
     private function getDatabaseSongStats(int $artistId)
     {
-        $tourIds = DbConcert::where('artist_id', $artistId)->pluck('id');
+        $songArtistIds = DbSong::pluck('artist_id', 'id');
+        $tourIds = DbConcert::whereIn('artist_id', $this->crossoverTourArtistIds($artistId))->pluck('id');
         $tourSetlists = DbSetlist::whereIn('tour_id', $tourIds)->get();
         $songTourCounts = [];
 
         foreach ($tourSetlists as $setlist) {
             foreach (array_merge($setlist->setlist ?? [], $setlist->encore ?? []) as $s) {
-                if (isset($s['song']) && is_numeric($s['song'])) {
+                if (isset($s['song']) && is_numeric($s['song']) && ($songArtistIds[(int)$s['song']] ?? null) === $artistId) {
                     $songId = (int)$s['song'];
                     $tourId = $setlist->tour_id;
                     if (!isset($songTourCounts[$songId])) $songTourCounts[$songId] = [];
@@ -425,13 +444,14 @@ class StatsController extends Controller
 
     private function getDatabaseEncoreSongStats(int $artistId)
     {
-        $tourIds = DbConcert::where('artist_id', $artistId)->pluck('id');
+        $songArtistIds = DbSong::pluck('artist_id', 'id');
+        $tourIds = DbConcert::whereIn('artist_id', $this->crossoverTourArtistIds($artistId))->pluck('id');
         $tourSetlists = DbSetlist::whereIn('tour_id', $tourIds)->get();
         $counts = [];
 
         foreach ($tourSetlists as $setlist) {
             foreach ($setlist->encore ?? [] as $s) {
-                if (isset($s['song']) && is_numeric($s['song'])) {
+                if (isset($s['song']) && is_numeric($s['song']) && ($songArtistIds[(int)$s['song']] ?? null) === $artistId) {
                     $songId = (int)$s['song'];
                     $tourId = $setlist->tour_id;
                     if (!isset($counts[$songId])) $counts[$songId] = [];
@@ -454,13 +474,14 @@ class StatsController extends Controller
 
     private function getDatabaseOpeningSongStats(int $artistId)
     {
-        $tourIds = DbConcert::where('artist_id', $artistId)->pluck('id');
+        $songArtistIds = DbSong::pluck('artist_id', 'id');
+        $tourIds = DbConcert::whereIn('artist_id', $this->crossoverTourArtistIds($artistId))->pluck('id');
         $tourSetlists = DbSetlist::whereIn('tour_id', $tourIds)->get();
         $counts = [];
 
         foreach ($tourSetlists as $setlist) {
             $songs = $setlist->setlist ?? [];
-            if (!empty($songs) && isset($songs[0]['song']) && is_numeric($songs[0]['song'])) {
+            if (!empty($songs) && isset($songs[0]['song']) && is_numeric($songs[0]['song']) && ($songArtistIds[(int)$songs[0]['song']] ?? null) === $artistId) {
                 $songId = (int)$songs[0]['song'];
                 $tourId = $setlist->tour_id;
                 if (!isset($counts[$songId])) $counts[$songId] = [];
