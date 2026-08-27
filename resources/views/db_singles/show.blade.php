@@ -10,6 +10,9 @@
             ['label' => $singles->title],
         ]])
             <p class="database-subtitle" style="">
+                <a href="{{ route('database.artist', $artist->id) }}">{{ $artist->name }}</a>
+            </p>
+            <p class="database-subtitle" style="">
                 @if($singles->download == 0 && $singles->single_id)
                     {{ ordinal($singles->single_id) }} Single
                 @elseif($singles->download)

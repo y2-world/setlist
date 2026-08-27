@@ -14,6 +14,9 @@
             ['label' => 'Songs', 'url' => route('database.songs', $songs->artist_id)],
             ['label' => $songs->title],
         ]])
+            <p class="database-subtitle" style="">
+                <a href="{{ route('database.artist', $songs->artist_id) }}">{{ $songs->artist->name }}</a>
+            </p>
             <p class="database-subtitle" style=""># {{ $songNumber }}</p>
             <h1 class="database-title sp" style="margin-bottom: 20px; cursor: pointer;"
                 onclick="document.getElementById('spSearchFormSongs').style.display='block'; document.querySelector('.database-title.sp').style.display='none';">

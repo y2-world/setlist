@@ -10,6 +10,9 @@
             ['label' => $albums->title],
         ]])
             <p class="database-subtitle" style="">
+                <a href="{{ route('database.artist', $artist->id) }}">{{ $artist->name }}</a>
+            </p>
+            <p class="database-subtitle" style="">
                 @if ($albums->best)
                     Best Album
                 @elseif ($albums->mini && $albums->album_id)
