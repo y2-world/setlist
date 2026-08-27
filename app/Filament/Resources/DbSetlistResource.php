@@ -18,6 +18,19 @@ class DbSetlistResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-queue-list';
 
+    // B'zのセットリストでは、稲葉浩志のソロ曲も選択肢に含める
+    private const BZ_ARTIST_ID = 3;
+    private const INABA_ARTIST_ID = 39;
+
+    protected static function songArtistIds($artistId): array
+    {
+        if ((int) $artistId === self::BZ_ARTIST_ID) {
+            return [self::BZ_ARTIST_ID, self::INABA_ARTIST_ID];
+        }
+
+        return [$artistId];
+    }
+
     protected static ?string $navigationLabel = 'セットリスト';
 
     protected static ?string $modelLabel = 'セットリスト';
@@ -99,7 +112,7 @@ class DbSetlistResource extends Resource
                                     ->label('曲名')
                                     ->options(fn(Get $get) => \App\Models\DbSong::when(
                                         $get('../../_artist_id'),
-                                        fn($q, $id) => $q->where('artist_id', $id)
+                                        fn($q, $id) => $q->whereIn('artist_id', static::songArtistIds($id))
                                     )->orderBy('title')->pluck('title', 'id'))
                                     ->searchable()
                                     ->native(false)
@@ -108,7 +121,7 @@ class DbSetlistResource extends Resource
                                     ->getSearchResultsUsing(function (string $search, Get $get) {
                                         return \App\Models\DbSong::when(
                                             $get('../../_artist_id'),
-                                            fn($q, $id) => $q->where('artist_id', $id)
+                                            fn($q, $id) => $q->whereIn('artist_id', static::songArtistIds($id))
                                         )->where('title', 'like', "%{$search}%")
                                             ->orderBy('title')
                                             ->limit(50)
@@ -207,7 +220,7 @@ class DbSetlistResource extends Resource
                                     ->label('曲名')
                                     ->options(fn(Get $get) => \App\Models\DbSong::when(
                                         $get('../../_artist_id'),
-                                        fn($q, $id) => $q->where('artist_id', $id)
+                                        fn($q, $id) => $q->whereIn('artist_id', static::songArtistIds($id))
                                     )->orderBy('title')->pluck('title', 'id'))
                                     ->searchable()
                                     ->native(false)
@@ -216,7 +229,7 @@ class DbSetlistResource extends Resource
                                     ->getSearchResultsUsing(function (string $search, Get $get) {
                                         return \App\Models\DbSong::when(
                                             $get('../../_artist_id'),
-                                            fn($q, $id) => $q->where('artist_id', $id)
+                                            fn($q, $id) => $q->whereIn('artist_id', static::songArtistIds($id))
                                         )->where('title', 'like', "%{$search}%")
                                             ->orderBy('title')
                                             ->limit(50)
