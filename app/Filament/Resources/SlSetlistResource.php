@@ -507,6 +507,15 @@ class SlSetlistResource extends Resource
                                                 ->maxLength(255)
                                                 ->dehydrated(),
                                         ]),
+                                        Forms\Components\Radio::make('featuring_type')
+                                            ->label('表示形式')
+                                            ->options([
+                                                'guest' => '共演者（feat.表記のまま表示）',
+                                                'artist' => '別名義アーティスト（「 / 」区切りで表示）',
+                                            ])
+                                            ->default('guest')
+                                            ->inline()
+                                            ->dehydrated(),
                                         Forms\Components\TextInput::make('version')
                                             ->label('バージョン')
                                             ->maxLength(255)
@@ -694,6 +703,15 @@ class SlSetlistResource extends Resource
                                                 ->maxLength(255)
                                                 ->dehydrated(),
                                         ]),
+                                        Forms\Components\Radio::make('featuring_type')
+                                            ->label('表示形式')
+                                            ->options([
+                                                'guest' => '共演者（feat.表記のまま表示）',
+                                                'artist' => '別名義アーティスト（「 / 」区切りで表示）',
+                                            ])
+                                            ->default('guest')
+                                            ->inline()
+                                            ->dehydrated(),
                                         Forms\Components\TextInput::make('version')
                                             ->label('バージョン')
                                             ->maxLength(255)

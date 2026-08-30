@@ -320,7 +320,10 @@
                                         $parts = splitAnnotation($title);
                                         $keyword = $parts['main'];
                                         $annotation = $parts['annotation'];
-                                        $feat = !empty($song['featuring']) ? ' <span style="color:#999;font-size:0.75em;">' . htmlspecialchars($song['featuring'], ENT_COMPAT, 'UTF-8') . '</span>' : '';
+                                        $songFeaturingType = $song['featuring_type'] ?? 'guest';
+                                        $feat = !empty($song['featuring'])
+                                            ? ' <span style="color:#999;font-size:0.75em;">' . ($songFeaturingType === 'artist' ? '/ ' : '') . htmlspecialchars($song['featuring'], ENT_COMPAT, 'UTF-8') . '</span>'
+                                            : '';
                                         $ver = !empty($song['version']) ? ' <span style="color:#999;font-size:0.75em;">' . htmlspecialchars($song['version'], ENT_COMPAT, 'UTF-8') . '</span>' : '';
                                         $isMedley = !empty($song['medley']) && $song['medley'] == 1;
                                         if ($isMedley) {
