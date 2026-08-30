@@ -166,12 +166,19 @@ class SlSetlistResource extends Resource
                                                 Forms\Components\Toggle::make('medley')
                                                     ->label('メドレー')
                                                     ->default(false),
-
-                                                Forms\Components\TextInput::make('featuring')
-                                                    ->label('共演者・アーティスト')
-                                                    ->placeholder('例: ゲスト名')
-                                                    ->maxLength(255),
                                             ]),
+                                        Forms\Components\Radio::make('featuring_type')
+                                            ->label('表示形式')
+                                            ->options([
+                                                'guest' => '共演者（feat.表記のまま表示）',
+                                                'artist' => '別名義アーティスト（「 / 」区切りで表示）',
+                                            ])
+                                            ->default('guest')
+                                            ->inline(),
+                                        Forms\Components\TextInput::make('featuring')
+                                            ->label('共演者・アーティスト')
+                                            ->placeholder('例: ゲスト名')
+                                            ->maxLength(255),
                                         Forms\Components\TextInput::make('version')
                                             ->label('バージョン')
                                             ->placeholder('例: (Acoustic Version)')
@@ -276,12 +283,19 @@ class SlSetlistResource extends Resource
                                                 Forms\Components\Toggle::make('medley')
                                                     ->label('メドレー')
                                                     ->default(false),
-
-                                                Forms\Components\TextInput::make('featuring')
-                                                    ->label('共演者・アーティスト')
-                                                    ->placeholder('例: ゲスト名')
-                                                    ->maxLength(255),
                                             ]),
+                                        Forms\Components\Radio::make('featuring_type')
+                                            ->label('表示形式')
+                                            ->options([
+                                                'guest' => '共演者（feat.表記のまま表示）',
+                                                'artist' => '別名義アーティスト（「 / 」区切りで表示）',
+                                            ])
+                                            ->default('guest')
+                                            ->inline(),
+                                        Forms\Components\TextInput::make('featuring')
+                                            ->label('共演者・アーティスト')
+                                            ->placeholder('例: ゲスト名')
+                                            ->maxLength(255),
                                         Forms\Components\TextInput::make('version')
                                             ->label('バージョン')
                                             ->placeholder('例: (Acoustic Version)')

@@ -102,8 +102,15 @@
                             $annotation = $parts['annotation'];
                             $keyword = $main;
 
-                            // 共演者がある場合は曲名の後に追加
-                            $featuring = !empty($data['featuring']) ? ' <span style="color:#999;font-size:0.75em;">' . $data['featuring'] . '</span>' : '';
+                            // 共演者・別名義アーティストがある場合は曲名の後に追加
+                            $featuringType = $data['featuring_type'] ?? 'guest';
+                            if (!empty($data['featuring']) && $featuringType === 'artist') {
+                                $featuring = ' <span style="color:#999;font-size:0.75em;">/ ' . $data['featuring'] . '</span>';
+                            } elseif (!empty($data['featuring'])) {
+                                $featuring = ' <span style="color:#999;font-size:0.75em;">' . $data['featuring'] . '</span>';
+                            } else {
+                                $featuring = '';
+                            }
 
                             // バージョン違いがある場合は共演者の後に追加
                             $version = !empty($data['version']) ? ' <span style="color:#999;font-size:0.75em;">' . $data['version'] . '</span>' : '';
@@ -194,8 +201,15 @@
                             $annotation = $parts['annotation'];
                             $keyword = $main;
 
-                            // 共演者がある場合は曲名の後に追加
-                            $featuring = !empty($data['featuring']) ? ' <span style="color:#999;font-size:0.75em;">' . $data['featuring'] . '</span>' : '';
+                            // 共演者・別名義アーティストがある場合は曲名の後に追加
+                            $featuringType = $data['featuring_type'] ?? 'guest';
+                            if (!empty($data['featuring']) && $featuringType === 'artist') {
+                                $featuring = ' <span style="color:#999;font-size:0.75em;">/ ' . $data['featuring'] . '</span>';
+                            } elseif (!empty($data['featuring'])) {
+                                $featuring = ' <span style="color:#999;font-size:0.75em;">' . $data['featuring'] . '</span>';
+                            } else {
+                                $featuring = '';
+                            }
 
                             // バージョン違いがある場合は共演者の後に追加
                             $version = !empty($data['version']) ? ' <span style="color:#999;font-size:0.75em;">' . $data['version'] . '</span>' : '';
@@ -345,9 +359,9 @@
                                     $isMedley = !empty($data['medley']) && $data['medley'] == 1;
                                     $artistDisplay = '';
                                     if ($artistName && $artistId) {
-                                        $artistDisplay = ' <span style="color:#999;font-size:0.75em;"><a href="' . url('/setlists/artists', $artistId) . '" style="color:#999;">' . htmlspecialchars($artistName, ENT_COMPAT, 'UTF-8') . '</a></span>';
+                                        $artistDisplay = ' <span style="color:#999;font-size:0.75em;">/ <a href="' . url('/setlists/artists', $artistId) . '" style="color:#999;">' . htmlspecialchars($artistName, ENT_COMPAT, 'UTF-8') . '</a></span>';
                                     } elseif ($artistName) {
-                                        $artistDisplay = ' <span style="color:#999;font-size:0.75em;">' . htmlspecialchars($artistName, ENT_COMPAT, 'UTF-8') . '</span>';
+                                        $artistDisplay = ' <span style="color:#999;font-size:0.75em;">/ ' . htmlspecialchars($artistName, ENT_COMPAT, 'UTF-8') . '</span>';
                                     }
                                     if (!empty($data['featuring'])) {
                                         $artistDisplay .= ' <span style="color:#999;font-size:0.75em;">' . htmlspecialchars($data['featuring'], ENT_COMPAT, 'UTF-8') . '</span>';
