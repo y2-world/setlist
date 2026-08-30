@@ -78,10 +78,15 @@
                 </tr>
             </thead>
             <tbody id="tours-container">
-                @include('db_concerts._list', ['tours' => $tours])
+                @if ($tours->isEmpty())
+                    <tr>
+                        <td colspan="4" class="text-center">ライブ情報がありません</td>
+                    </tr>
+                @else
+                    @include('db_concerts._list', ['tours' => $tours])
+                @endif
             </tbody>
         </table>
-        </div>
         <div class="pagination" id="pagination-links" style="display: none;">
             {!! $tours->appends(['type' => $type])->links() !!}
         </div>
@@ -102,7 +107,7 @@
                     container: '#tours-container',
                     nextPageUrl: nextUrl
                 });
-            @else
+            @elseif($tours->isNotEmpty())
                 const pagination = document.getElementById('pagination-links');
                 if (pagination) {
                     pagination.style.display = 'block';
