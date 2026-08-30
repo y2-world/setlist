@@ -97,7 +97,7 @@
                                         /
                                         <a href="{{ route('setlists.show', $setlist->id) }}">{{ $setlist->title }}</a>
                                     </td>
-                                    <td class="pc">
+                                    <td class="pc td_artist">
                                         <a href="{{ url('/setlists/artists', $setlist->artist_id) }}">{{ $setlist->artist->name }}</a>
                                     </td>
                                 @else

@@ -1813,6 +1813,10 @@ h2 {
     max-width: 100%;
 }
 
+.database-year-content .table tbody td.td_artist {
+    white-space: nowrap;
+}
+
 /* 770px-1100pxの範囲でテーブルが適切に表示されるようにする */
 @media screen and (min-width: 769px) and (max-width: 1100px) {
     .database-year-content .table {
@@ -1833,7 +1837,11 @@ h2 {
         width: auto;
         min-width: 100px;
     }
-    
+
+    .database-year-content .table tbody td.td_artist {
+        white-space: nowrap;
+    }
+
     /* テーブル全体のコンテナにも幅を確保 */
     .database-year-content .table thead th.mobile {
         display: table-cell;
