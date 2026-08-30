@@ -1056,7 +1056,7 @@ h2 {
     }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1081px) {
     .mb-sns-nav {
         display: none;
     }
@@ -1790,6 +1790,7 @@ h2 {
     border: none;
     padding: 15px;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .database-year-content .table tbody tr {
@@ -1817,8 +1818,8 @@ h2 {
     white-space: nowrap;
 }
 
-/* 770px-1100pxの範囲でテーブルが適切に表示されるようにする */
-@media screen and (min-width: 769px) and (max-width: 1100px) {
+/* 770px-1080pxの範囲でテーブルが適切に表示されるようにする（.pc/.pc_venueの非表示境界と揃える） */
+@media screen and (min-width: 769px) and (max-width: 1080px) {
     .database-year-content .table {
         table-layout: auto;
         width: 100%;

@@ -174,7 +174,9 @@
                                                     @php
                                                         $isDaily = isset($data['is_daily']) && $data['is_daily'];
                                                         $dailyNote = isset($data['daily_note']) ? $data['daily_note'] : '';
+                                                        $featuringType = $data['featuring_type'] ?? 'guest';
                                                         $featuring = isset($data['featuring']) ? $data['featuring'] : '';
+                                                        $featuringDisplay = $featuring !== '' && $featuringType === 'artist' ? '/ ' . $featuring : $featuring;
                                                         $alternativeTitle = isset($data['alternative_title']) ? $data['alternative_title'] : '';
                                                         $isNumericSong = is_numeric($data['song'] ?? '');
                                                         $title = '';
@@ -201,7 +203,7 @@
                                                             @if($isUnique)<strong>{{ $title }}</strong>@else{{ $title }}@endif
                                                         @endif
                                                         @if(!empty($featuring))
-                                                            <span style="color:#999;font-size:0.75em;">{{ $featuring }}</span>
+                                                            <span style="color:#999;font-size:0.75em;">{{ $featuringDisplay }}</span>
                                                         @endif
                                                         @if(!empty($dailyNote))
                                                             <span style="color:#999;font-size:0.75em;">{{ $dailyNote }}</span>
@@ -215,7 +217,7 @@
                                                                 {{ $title }}
                                                             @endif
                                                             @if(!empty($featuring))
-                                                                <span style="color:#999;font-size:0.75em;">{{ $featuring }}</span>
+                                                                <span style="color:#999;font-size:0.75em;">{{ $featuringDisplay }}</span>
                                                             @endif
                                                             @if(!empty($dailyNote))
                                                                 <span style="color:#999;font-size:0.75em;">{{ $dailyNote }}</span>

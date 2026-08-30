@@ -164,6 +164,15 @@ class DbSetlistResource extends Resource
                                             ->placeholder('例: ゲスト名')
                                             ->maxLength(255),
 
+                                        Forms\Components\Radio::make('featuring_type')
+                                            ->label('表示形式')
+                                            ->options([
+                                                'guest' => '共演者（feat.表記のまま表示）',
+                                                'artist' => '別名義アーティスト（「 / 」区切りで表示）',
+                                            ])
+                                            ->default('guest')
+                                            ->inline(),
+
                                         Forms\Components\TextInput::make('alternative_title')
                                             ->label('別表記')
                                             ->placeholder('例: I\'LL BE')
@@ -273,6 +282,15 @@ class DbSetlistResource extends Resource
                                             ->label('共演者・アーティスト')
                                             ->placeholder('例: ゲスト名')
                                             ->maxLength(255),
+
+                                        Forms\Components\Radio::make('featuring_type')
+                                            ->label('表示形式')
+                                            ->options([
+                                                'guest' => '共演者（feat.表記のまま表示）',
+                                                'artist' => '別名義アーティスト（「 / 」区切りで表示）',
+                                            ])
+                                            ->default('guest')
+                                            ->inline(),
 
                                         Forms\Components\TextInput::make('alternative_title')
                                             ->label('別表記')
