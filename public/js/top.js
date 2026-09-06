@@ -153,10 +153,13 @@ document.addEventListener("DOMContentLoaded", function () {
         let musicHTML = "";
         musicData.forEach((musicItem) => {
             const formattedDate = formatDate(musicItem.date);
+            const artworkHTML = musicItem.image
+                ? `<img src="https://res.cloudinary.com/hqrgbxuiv/${musicItem.image}" class="album-image">`
+                : `<div class="album-image album-image--placeholder">NOW PRINTING</div>`;
             musicHTML += `
                 <div class="album-container">
                     <a href="/music/${musicItem.id}">
-                        <img src="https://res.cloudinary.com/hqrgbxuiv/${musicItem.image}" class="album-image">
+                        ${artworkHTML}
                     </a>
                     <div class="music-item__gray">
                         <a style="color: black;" href="/music/${musicItem.id}">${musicItem.title}</a>
@@ -217,9 +220,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const popupDate = document.getElementById('popup-date');
     const popupText = document.getElementById('popup-text');
     const popupImg = document.getElementById('popup-img');
-    const popupOpenLink = document.getElementById('popup-open-link');
     const closeBtn = document.querySelector('.close-btn');
     const newsContainer = document.getElementById('news-container');
+
+    const basePath = window.location.pathname;
 
     // 動的要素にも適用するためのイベントデリゲーション
     newsContainer.addEventListener('click', function (e) {
@@ -227,74 +231,94 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const newsLink = e.target.closest('.news-link');
             const newsId = newsLink.getAttribute('data-id');
-
-            fetch(`/news/${newsId}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTPエラー: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                        return;
-                    }
-
-                    // 日付を整形
-                    const date = new Date(data.published_at || data.date);
-                    const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
-
-                    // データをポップアップにセット
-                    popupTitle.textContent = data.title;
-                    popupDate.textContent = formattedDate;
-
-                    // XSS対策: textContentを使用する or HTMLを許可するならDOMPurifyを利用
-                    popupText.innerHTML = data.text; 
-                    // popupText.innerHTML = DOMPurify.sanitize(data.text);
-
-                    if (data.image) {
-                        popupImg.style.display = 'block';
-                        popupImg.src = `https://res.cloudinary.com/hqrgbxuiv/${data.image}`;
-                    } else {
-                        popupImg.style.display = 'none'; // 画像がない場合は非表示にする
-                    }
-
-                    // 個別ページのリンクを設定
-                    popupOpenLink.href = `/news/${newsId}`;
-
-                    // ポップアップを表示
-                    overlay.classList.add('open');
-                    popup.classList.add('open');
-                    document.body.style.overflow = 'hidden';
-                })
-                .catch(error => {
-                    console.error('エラーが発生しました:', error);
-                });
+            openNewsPopup(newsId, true);
         }
     });
 
+    function openNewsPopup(newsId, pushState) {
+        fetch(`/news/${newsId}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // 日付を整形
+                const date = new Date(data.published_at || data.date);
+                const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+
+                // データをポップアップにセット
+                popupTitle.textContent = data.title;
+                popupDate.textContent = formattedDate;
+
+                // XSS対策: textContentを使用する or HTMLを許可するならDOMPurifyを利用
+                popupText.innerHTML = data.text;
+                // popupText.innerHTML = DOMPurify.sanitize(data.text);
+
+                if (data.image) {
+                    popupImg.style.display = 'block';
+                    popupImg.src = `https://res.cloudinary.com/hqrgbxuiv/${data.image}`;
+                } else {
+                    popupImg.style.display = 'none'; // 画像がない場合は非表示にする
+                }
+
+                // ポップアップを表示
+                overlay.classList.add('open');
+                popup.classList.add('open');
+                document.body.style.overflow = 'hidden';
+
+                // URLをシェア可能な個別記事URLに変更（ページ遷移はしない）
+                if (pushState) {
+                    history.pushState({ newsId: newsId }, '', `/news/${newsId}`);
+                }
+            })
+            .catch(error => {
+                console.error('エラーが発生しました:', error);
+            });
+    }
+
     // ポップアップを閉じる
-    closeBtn.addEventListener('click', closeNewsPopup);
-    overlay.addEventListener('click', closeNewsPopup);
+    closeBtn.addEventListener('click', function () { closeNewsPopup(true); });
+    overlay.addEventListener('click', function () { closeNewsPopup(true); });
 
     // Escキーでポップアップを閉じる
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && popup.classList.contains('open')) {
-            closeNewsPopup();
+            closeNewsPopup(true);
         }
     });
 
-    function closeNewsPopup() {
+    function closeNewsPopup(popState) {
         popup.classList.remove('open');
         overlay.classList.remove('open');
         document.body.style.overflow = '';
+
+        // ポップアップを閉じたら元のURLに戻す
+        if (popState && window.location.pathname !== basePath) {
+            history.pushState(null, '', basePath);
+        }
     }
+
+    // ブラウザの戻る/進むボタンでポップアップの開閉を同期
+    window.addEventListener('popstate', function (e) {
+        const match = window.location.pathname.match(/^\/news\/(\d+)$/);
+        if (match) {
+            openNewsPopup(match[1], false);
+        } else if (popup.classList.contains('open')) {
+            closeNewsPopup(false);
+        }
+    });
 });
 
 // Fade-in on observe

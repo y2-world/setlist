@@ -533,6 +533,24 @@ img {
     cursor: pointer;
 }
 
+.album-image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e2e2e2;
+    color: #999;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-align: center;
+    box-shadow: 0 5px 5px gray;
+    transition: box-shadow 0.5s;
+    margin-bottom: 20px;
+}
+
+.album-image--placeholder:hover {
+    box-shadow: 5px 5px 50px gray;
+}
+
 .music-wrapper {
     position: relative;
 }

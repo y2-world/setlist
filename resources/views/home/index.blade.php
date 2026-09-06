@@ -52,16 +52,7 @@
             <span class="close-btn">&times;</span>
             <div class="news-item">
                 <h4 id="popup-title"></h4>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <small class="date" id="popup-date"></small>
-                    <a href="#" id="popup-open-link" target="_blank" style="color: #666; text-decoration: none; opacity: 0.6; transition: opacity 0.2s; flex-shrink: 0; margin-left: 10px;" title="Open in new tab" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                    </a>
-                </div>
+                <small class="date" id="popup-date"></small>
                 <hr>
                 <div class="news-text" id="popup-text"></div>
                 <img class="image" width="100%" style="padding-top: 10px;" id="popup-img">
@@ -81,8 +72,12 @@
                                     @foreach ($discos as $disc)
                                         <div class="album-container">
                                             <a href="{{ route('music.show', $disc->id) }}">
-                                                <img src="https://res.cloudinary.com/hqrgbxuiv/{{ $disc->image }}"
-                                                    class="album-image">
+                                                @if (!empty($disc->image))
+                                                    <img src="https://res.cloudinary.com/hqrgbxuiv/{{ $disc->image }}"
+                                                        class="album-image">
+                                                @else
+                                                    <div class="album-image album-image--placeholder">NOW PRINTING</div>
+                                                @endif
                                             </a>
                                             <div class="music-item__gray">
                                                 <a style="color: black;" href="{{ route('music.show', $disc->id) }}">{{ $disc->title }}</a>
@@ -95,8 +90,12 @@
                                     @foreach ($discos as $disc)
                                         <div class="album-container">
                                             <a href="{{ route('music.show', $disc->id) }}">
-                                                <img src="https://res.cloudinary.com/hqrgbxuiv/{{ $disc->image }}"
-                                                    class="album-image">
+                                                @if (!empty($disc->image))
+                                                    <img src="https://res.cloudinary.com/hqrgbxuiv/{{ $disc->image }}"
+                                                        class="album-image">
+                                                @else
+                                                    <div class="album-image album-image--placeholder">NOW PRINTING</div>
+                                                @endif
                                             </a>
                                             <div class="music-item__gray">
                                                 <a style="color: black;" href="{{ route('music.show', $disc->id) }}">{{ $disc->title }}</a>

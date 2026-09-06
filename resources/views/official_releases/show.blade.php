@@ -2,17 +2,21 @@
 @section('title', 'Yuki Official - ' . $discos->title)
 
 @php
-    try {
-        $imageUrl = \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($discos->image);
-    } catch (\Exception $e) {
-        $imagePath = $discos->image;
-        if (strpos($imagePath, 'http') === 0) {
-            $imageUrl = $imagePath;
-        } elseif (strpos($imagePath, 'image/upload') !== false) {
-            $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/' . $imagePath;
-        } else {
-            $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/image/upload/' . $imagePath;
+    if (!empty($discos->image)) {
+        try {
+            $imageUrl = \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($discos->image);
+        } catch (\Exception $e) {
+            $imagePath = $discos->image;
+            if (strpos($imagePath, 'http') === 0) {
+                $imageUrl = $imagePath;
+            } elseif (strpos($imagePath, 'image/upload') !== false) {
+                $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/' . $imagePath;
+            } else {
+                $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/image/upload/' . $imagePath;
+            }
         }
+    } else {
+        $imageUrl = asset('/images/top_image.jpg');
     }
 @endphp
 
@@ -35,27 +39,31 @@
                         <div class="row">
                             <div class="col-xl-6">
                                 <div class="modal-img">
-                                    @php
-                                        try {
-                                            // Cloudinaryディスクを使用してURLを取得
-                                            $imageUrl = \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($discos->image);
-                                        } catch (\Exception $e) {
-                                            // フォールバック: 直接URLを構築
-                                            $imagePath = $discos->image;
-                                            if (strpos($imagePath, 'http') === 0) {
-                                                $imageUrl = $imagePath;
-                                            } elseif (strpos($imagePath, 'image/upload') !== false) {
-                                                $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/' . $imagePath;
-                                            } else {
-                                                $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/image/upload/' . $imagePath;
+                                    @if (!empty($discos->image))
+                                        @php
+                                            try {
+                                                // Cloudinaryディスクを使用してURLを取得
+                                                $imageUrl = \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($discos->image);
+                                            } catch (\Exception $e) {
+                                                // フォールバック: 直接URLを構築
+                                                $imagePath = $discos->image;
+                                                if (strpos($imagePath, 'http') === 0) {
+                                                    $imageUrl = $imagePath;
+                                                } elseif (strpos($imagePath, 'image/upload') !== false) {
+                                                    $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/' . $imagePath;
+                                                } else {
+                                                    $imageUrl = 'https://res.cloudinary.com/hqrgbxuiv/image/upload/' . $imagePath;
+                                                }
                                             }
-                                        }
-                                    @endphp
-                                    <img src="{{ $imageUrl }}"
-                                        style="width: 100%;"
-                                        alt="{{ $discos->title }}"
-                                        loading="lazy"
-                                        decoding="async">
+                                        @endphp
+                                        <img src="{{ $imageUrl }}"
+                                            style="width: 100%;"
+                                            alt="{{ $discos->title }}"
+                                            loading="lazy"
+                                            decoding="async">
+                                    @else
+                                        <div class="album-image--placeholder" style="width: 100%; aspect-ratio: 1 / 1;">NOW PRINTING</div>
+                                    @endif
                                 </div>
                             </div>
                             @if (!empty($discos->tracklist))
