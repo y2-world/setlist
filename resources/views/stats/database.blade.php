@@ -82,7 +82,7 @@
                     <!-- Most Performed Songs Section -->
                     <div class="stats-section visible">
                         <h2 class="section-title">
-                            <i class="fas fa-fire"></i> Most Performed Songs in Tours ({{ count($songStats) }})
+                            <i class="fas fa-fire"></i> Most Performed Songs in Tours ({{ count(array_filter($songStats, fn($s) => $s['count'] > 0)) }})
                         </h2>
                         <div class="stats-table-container">
                             <table class="stats-table">

@@ -31,6 +31,25 @@ class StatsController extends Controller
         return [$artistId];
     }
 
+    // フェスのセットリスト（fes_setlist/fes_encore）は、通常の曲を直接並べた形式（interleaved）と、
+    // アーティストごとに曲をまとめたブロック形式（type: 'block', songs: [...]）が混在し得る。
+    // ブロック形式の要素はそれ自体に song キーを持たず、ネストされた songs 配列の中に曲がある。
+    // 集計処理はすべてこのヘルパーを通し、ブロックを展開した「曲エントリのフラットな配列」を得る。
+    private function flattenFesSongs(array $fesItems): array
+    {
+        $flattened = [];
+        foreach ($fesItems as $item) {
+            if (($item['type'] ?? 'song') === 'block') {
+                foreach ($item['songs'] ?? [] as $song) {
+                    $flattened[] = $song + ['artist' => $item['artist'] ?? null];
+                }
+            } else {
+                $flattened[] = $item;
+            }
+        }
+        return $flattened;
+    }
+
     public function index(Request $request)
     {
         $tab = $request->get('tab', 'personal');
@@ -101,8 +120,8 @@ class StatsController extends Controller
             $songs = array_merge(
                 $setlist->setlist ?? [],
                 $setlist->encore ?? [],
-                $setlist->fes_setlist ?? [],
-                $setlist->fes_encore ?? []
+                $this->flattenFesSongs($setlist->fes_setlist ?? []),
+                $this->flattenFesSongs($setlist->fes_encore ?? [])
             );
             foreach ($songs as $songData) {
                 if (isset($songData['song']) && is_numeric($songData['song'])) {
@@ -142,8 +161,8 @@ class StatsController extends Controller
                 $allSongs = array_merge(
                     $setlist->setlist ?? [],
                     $setlist->encore ?? [],
-                    $setlist->fes_setlist ?? [],
-                    $setlist->fes_encore ?? []
+                    $this->flattenFesSongs($setlist->fes_setlist ?? []),
+                    $this->flattenFesSongs($setlist->fes_encore ?? [])
                 );
 
                 $tourName = $setlist->title ?? 'Unknown';
@@ -181,8 +200,8 @@ class StatsController extends Controller
                 $allSongs = array_merge(
                     $setlist->setlist ?? [],
                     $setlist->encore ?? [],
-                    $setlist->fes_setlist ?? [],
-                    $setlist->fes_encore ?? []
+                    $this->flattenFesSongs($setlist->fes_setlist ?? []),
+                    $this->flattenFesSongs($setlist->fes_encore ?? [])
                 );
 
                 // このセットリスト内で既に登場した曲を記録
@@ -428,6 +447,16 @@ class StatsController extends Controller
             $song = DbSong::find($songId);
             if ($song) $stats[] = ['song_id' => $songId, 'title' => $song->title, 'count' => $count];
         }
+
+        // ツアーで一度も演奏されていない曲をリストの最後に追加（演奏回数0）
+        $unplayedSongs = DbSong::where('artist_id', $artistId)
+            ->whereNotIn('id', array_keys($songTourCounts))
+            ->orderBy('id')
+            ->get();
+        foreach ($unplayedSongs as $song) {
+            $stats[] = ['song_id' => $song->id, 'title' => $song->title, 'count' => 0];
+        }
+
         return $stats;
     }
 
@@ -558,7 +587,8 @@ class StatsController extends Controller
             }
             // フェスの場合は、そのアーティストの曲のみ抽出
             elseif ($setlist->fes == 1) {
-                foreach (array_merge($setlist->fes_setlist ?? [], $setlist->fes_encore ?? []) as $songData) {
+                $fesSongs = $this->flattenFesSongs(array_merge($setlist->fes_setlist ?? [], $setlist->fes_encore ?? []));
+                foreach ($fesSongs as $songData) {
                     if (isset($songData['artist']) && $songData['artist'] == $artistId) {
                         $allSongs[] = $songData;
                     }
@@ -602,7 +632,8 @@ class StatsController extends Controller
 
             // フェスの場合は、そのアーティストの曲のみ抽出
             if ($setlist->fes == 1) {
-                foreach (array_merge($setlist->fes_setlist ?? [], $setlist->fes_encore ?? []) as $songData) {
+                $fesSongs = $this->flattenFesSongs(array_merge($setlist->fes_setlist ?? [], $setlist->fes_encore ?? []));
+                foreach ($fesSongs as $songData) {
                     if (isset($songData['artist']) && (string)$songData['artist'] === (string)$artistId) {
                         $allSongs[] = $songData;
                     }
